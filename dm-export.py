@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import os.path
+import configparser
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -16,10 +17,21 @@ SAMPLE_SPREADSHEET_ID = '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms'
 SAMPLE_RANGE_NAME = 'Class Data!A2:E'
 
 
-def main():
-    """Shows basic usage of the Sheets API.
-    Prints values from a sample spreadsheet.
-    """
+def loadConfig():
+    print('Load settings.')
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    return config
+
+
+def saveConfig(config):
+    print('Save settings.')
+    with open('config.ini', 'w') as configfile:
+        config.write(configfile)
+
+
+def loginGoogle():
+    print('Log into Google Sheets.')
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -38,6 +50,18 @@ def main():
         with open('token.json', 'w') as token:
             token.write(creds.to_json())
 
+    return creds
+
+
+def loginTwitter():
+    print('Log into Twitter.')
+    pass
+
+
+def openSpreadsheet(creds):
+    print('Open spreadsheet.')
+    # TODO: check for spreadsheet ID in the config file
+    # TODO: if it's not there prompt the user for a name and create it
     try:
         service = build('sheets', 'v4', credentials=creds)
 
@@ -59,6 +83,26 @@ def main():
         print(err)
 
 
+def exportMentions():
+    print('Export mentions to spreadsheet.')
+    # TODO: some way of avoiding re-export
+    pass
+
+
+def exportDMs():
+    print('Export direct messages to spreadsheet.')
+    # TODO: some way of avoiding re-export
+
+
+def main():
+    config = loadConfig()
+    loginTwitter()
+    googleCreds = loginGoogle()
+    openSpreadsheet(googleCreds)
+    exportMentions()
+    exportDMs()
+    saveConfig(config)
+
+
 if __name__ == '__main__':
     main()
-
